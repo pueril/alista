@@ -5,50 +5,71 @@
         </div>
     @endif
 
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
             <h3 class="text-lg font-semibold text-gray-800">Control de Asistencia</h3>
             <p class="text-sm text-gray-500 mt-1">Registro semanal de ausencias y atrasos</p>
         </div>
-        <div class="flex flex-wrap gap-3">
-            <select
-                wire:model.live="selectedAnio"
-                class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+        @if($this->isSupervisor)
+            <button
+                type="button"
+                wire:click="openCreateModal"
+                class="inline-flex items-center gap-2.5 rounded-lg bg-sky-200 px-6 py-3.5 text-lg font-semibold text-sky-900 shadow-md border border-sky-300 hover:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 active:bg-sky-400"
             >
-                @for($year = 2024; $year <= 2037; $year++)
-                    <option value="{{ $year }}">{{ $year }}</option>
-                @endfor
-            </select>
-            <select
-                wire:model.live="selectedMes"
-                class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-                <option value="">Todos los meses</option>
-                @php
-                    $meses = [
-                        1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
-                        5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
-                        9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
-                    ];
-                @endphp
-                @foreach($meses as $num => $nombre)
-                    <option value="{{ $num }}">Semanas {{ $nombre }}</option>
-                @endforeach
-            </select>
-            <select
-                wire:model.live="selectedSemana"
-                class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-                <option value="">Todas las semanas</option>
-                @for($week = 1; $week <= 52; $week++)
-                    <option value="{{ $week }}">Semana {{ $week }} ({{ $this->getWeekDateRange($week, $selectedAnio) }})</option>
-                @endfor
-            </select>
-            @if($this->isSupervisor)
-                <x-primary-button wire:click="openCreateModal">
-                    {{ __('Nuevo Registro') }}
-                </x-primary-button>
-            @endif
+                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-sky-500/30 text-sky-900 text-xl font-bold leading-none" aria-hidden="true">+</span>
+                {{ __('Nuevo Registro') }}
+            </button>
+        @endif
+    </div>
+
+    <!-- Filtros -->
+    <div class="rounded-2xl bg-slate-200/80 p-4 shadow-inner border border-slate-300/50">
+        <div class="flex flex-wrap items-end gap-3 sm:gap-4">
+            <div class="w-[8rem]">
+                <x-input-label for="selectedAnio" :value="__('Año')" class="!text-xs" />
+                <select
+                    id="selectedAnio"
+                    wire:model.live="selectedAnio"
+                    class="mt-1 block w-full text-sm h-9 py-1.5 px-3 rounded-lg border-slate-300 bg-white focus:ring-2 focus:ring-sky-400 focus:border-sky-400"
+                >
+                    @for($year = 2024; $year <= 2037; $year++)
+                        <option value="{{ $year }}">{{ $year }}</option>
+                    @endfor
+                </select>
+            </div>
+            <div class="w-[10rem]">
+                <x-input-label for="selectedMes" :value="__('Mes')" class="!text-xs" />
+                <select
+                    id="selectedMes"
+                    wire:model.live="selectedMes"
+                    class="mt-1 block w-full text-sm h-9 py-1.5 px-3 rounded-lg border-slate-300 bg-white focus:ring-2 focus:ring-sky-400 focus:border-sky-400"
+                >
+                    <option value="">Todos los meses</option>
+                    @php
+                        $meses = [
+                            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+                            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+                            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+                        ];
+                    @endphp
+                    @foreach($meses as $num => $nombre)
+                        <option value="{{ $num }}">Semanas {{ $nombre }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="w-[12rem]">
+                <x-input-label for="selectedSemana" :value="__('Semana')" class="!text-xs" />
+                <select
+                    id="selectedSemana"
+                    wire:model.live="selectedSemana"
+                    class="mt-1 block w-full text-sm h-9 py-1.5 px-3 rounded-lg border-slate-300 bg-white focus:ring-2 focus:ring-sky-400 focus:border-sky-400"
+                >
+                    <option value="">Todas las semanas</option>
+                    @for($week = 1; $week <= 52; $week++)
+                        <option value="{{ $week }}">Semana {{ $week }} ({{ $this->getWeekDateRange($week, $selectedAnio) }})</option>
+                    @endfor
+                </select>
+            </div>
         </div>
     </div>
 
@@ -278,16 +299,20 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                            <x-primary-button type="submit" class="w-full sm:w-auto sm:ml-3">
-                                {{ $editingId ? __('Actualizar') : __('Guardar') }}
-                            </x-primary-button>
+                        <div class="mt-6 pt-5 pb-5 px-4 sm:px-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-3">
                             <button
                                 type="button"
                                 wire:click="closeModal"
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                                class="w-full sm:w-auto inline-flex justify-center items-center rounded-lg border border-slate-300 bg-white px-4 py-4 text-base font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
                             >
                                 {{ __('Cancelar') }}
+                            </button>
+                            <button
+                                type="submit"
+                                style="background-color: #2563eb; color: #ffffff;"
+                                class="w-full sm:w-auto inline-flex justify-center items-center rounded-lg px-5 py-4 text-base font-semibold shadow-md border border-blue-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                            >
+                                {{ $editingId ? __('Actualizar') : __('Guardar') }}
                             </button>
                         </div>
                     </form>

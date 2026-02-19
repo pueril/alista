@@ -22,3 +22,11 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+GUIA_DESPLIEGUE.md
+RESUMEN_RAPIDO.md
+CHECKLIST_DESPLIEGUE.md
+SOLUCION_ERROR_403.md
+preparar-despliegue.sh
+preparar-despliegue.bat
+archivos-a-subir.txt
+/public/test.php

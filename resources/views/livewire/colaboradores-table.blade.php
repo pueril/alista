@@ -1,23 +1,25 @@
-<div class="space-y-6">
+<div class="space-y-4 sm:space-y-6">
     @if (session()->has('message'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-            <span class="block sm:inline">{{ session('message') }}</span>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-sm" role="alert">
+            {{ session('message') }}
         </div>
     @endif
 
-    <div class="flex justify-between items-center">
-        <div>
-            <h3 class="text-lg font-semibold text-gray-800">Gestión de Colaboradores</h3>
-            <p class="text-sm text-gray-500 mt-1">Administra el equipo del área de alistamiento</p>
-        </div>
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <h3 class="text-lg font-semibold text-gray-800">Colaboradores</h3>
         @if($this->isSupervisor)
-            <x-primary-button wire:click="openCreateModal">
+            <button
+                type="button"
+                wire:click="openCreateModal"
+                class="inline-flex items-center gap-2.5 rounded-lg bg-sky-200 px-6 py-3.5 text-lg font-semibold text-sky-900 shadow-md border border-sky-300 hover:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 active:bg-sky-400"
+            >
+                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-sky-500/30 text-sky-900 text-xl font-bold leading-none" aria-hidden="true">+</span>
                 {{ __('Nuevo Colaborador') }}
-            </x-primary-button>
+            </button>
         @endif
     </div>
 
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -80,37 +82,40 @@
                             </td>
                             @if($this->isSupervisor)
                                 <td class="px-4 py-2 whitespace-nowrap text-sm text-center">
-                                    <div class="flex justify-center gap-2">
+                                    <div class="flex justify-center items-center gap-4">
                                         <button
+                                            type="button"
                                             wire:click="openEditModal('{{ $colaborador->id }}')"
-                                            class="text-indigo-600 hover:text-indigo-900"
+                                            class="inline-flex items-center justify-center min-w-[2.75rem] min-h-[2.75rem] p-2 rounded-lg text-indigo-600 hover:bg-indigo-50 hover:text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
                                             title="Editar"
                                         >
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
                                         <button
+                                            type="button"
                                             wire:click="toggleActive('{{ $colaborador->id }}')"
-                                            class="{{ $colaborador->activo ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900' }}"
+                                            class="inline-flex items-center justify-center min-w-[2.75rem] min-h-[2.75rem] p-2 rounded-lg {{ $colaborador->activo ? 'text-amber-600 hover:bg-amber-50 hover:text-amber-900' : 'text-green-600 hover:bg-green-50 hover:text-green-900' }} focus:outline-none focus:ring-2 focus:ring-offset-1 {{ $colaborador->activo ? 'focus:ring-amber-500' : 'focus:ring-green-500' }}"
                                             title="{{ $colaborador->activo ? 'Desactivar' : 'Activar' }}"
                                         >
                                             @if($colaborador->activo)
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
                                             @else
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                 </svg>
                                             @endif
                                         </button>
                                         <button
+                                            type="button"
                                             wire:click="openDeleteModal('{{ $colaborador->id }}')"
-                                            class="text-red-600 hover:text-red-900"
+                                            class="inline-flex items-center justify-center min-w-[2.75rem] min-h-[2.75rem] p-2 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
                                             title="Eliminar permanentemente"
                                         >
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
                                         </button>
@@ -129,7 +134,7 @@
             </table>
         </div>
 
-        <div class="px-4 py-3 border-t border-gray-200">
+        <div class="px-4 py-3 border-t border-slate-200 bg-slate-50/50">
             {{ $colaboradores->links() }}
         </div>
     </div>
@@ -141,10 +146,10 @@
 
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-200">
                     <form wire:submit.prevent="save">
-                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                        <div class="px-4 pt-5 pb-2 sm:p-6 sm:pb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-5">
                                 {{ $editingId ? __('Editar Colaborador') : __('Nuevo Colaborador') }}
                             </h3>
 
@@ -155,7 +160,7 @@
                                         id="formIniciales"
                                         type="text"
                                         wire:model="formIniciales"
-                                        class="mt-1 block w-full"
+                                        class="mt-1 block w-full rounded-lg border-slate-300"
                                         maxlength="4"
                                         required
                                     />
@@ -169,7 +174,7 @@
                                         id="formNombre"
                                         type="text"
                                         wire:model="formNombre"
-                                        class="mt-1 block w-full"
+                                        class="mt-1 block w-full rounded-lg border-slate-300"
                                         required
                                     />
                                     <x-input-error :messages="$errors->get('formNombre')" class="mt-2" />
@@ -180,7 +185,7 @@
                                     <select
                                         id="formPerfil"
                                         wire:model="formPerfil"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        class="mt-1 block w-full rounded-lg border-slate-300 shadow-sm focus:ring-sky-500 focus:border-sky-500 py-2"
                                         required
                                     >
                                         <option value="AYUDANTE">{{ __('Ayudante') }}</option>
@@ -192,16 +197,20 @@
                             </div>
                         </div>
 
-                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                            <x-primary-button type="submit" class="w-full sm:w-auto sm:ml-3">
-                                {{ $editingId ? __('Actualizar') : __('Crear') }}
-                            </x-primary-button>
+                        <div class="mt-6 pt-5 pb-5 px-4 sm:px-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-3">
                             <button
                                 type="button"
                                 wire:click="closeModal"
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                                class="w-full sm:w-auto inline-flex justify-center items-center rounded-lg border border-slate-300 bg-white px-4 py-4 text-base font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
                             >
                                 {{ __('Cancelar') }}
+                            </button>
+                            <button
+                                type="submit"
+                                style="background-color: #2563eb; color: #ffffff;"
+                                class="w-full sm:w-auto inline-flex justify-center items-center rounded-lg px-5 py-4 text-base font-semibold shadow-md border border-blue-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                            >
+                                {{ $editingId ? __('Actualizar') : __('Crear') }}
                             </button>
                         </div>
                     </form>
@@ -220,9 +229,9 @@
 
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-200">
+                    <div class="px-4 pt-5 pb-2 sm:p-6 sm:pb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-5">
                             {{ __('Confirmar Eliminación') }}
                         </h3>
 
@@ -236,20 +245,21 @@
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button
-                            type="button"
-                            wire:click="confirmDelete"
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-                        >
-                            {{ __('Eliminar Permanentemente') }}
-                        </button>
+                    <div class="mt-6 pt-5 pb-5 px-4 sm:px-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-3">
                         <button
                             type="button"
                             wire:click="closeDeleteModal"
-                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                            class="w-full sm:w-auto inline-flex justify-center items-center rounded-lg border border-slate-300 bg-white px-4 py-4 text-base font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
                         >
                             {{ __('Cancelar') }}
+                        </button>
+                        <button
+                            type="button"
+                            wire:click="confirmDelete"
+                            class="w-full sm:w-auto inline-flex justify-center items-center rounded-lg px-5 py-4 text-base font-semibold text-white shadow-md border border-red-700 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                            style="background-color: #dc2626;"
+                        >
+                            {{ __('Eliminar Permanentemente') }}
                         </button>
                     </div>
                 </div>

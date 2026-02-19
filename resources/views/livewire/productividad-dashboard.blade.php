@@ -7,15 +7,16 @@
     </div>
 
     <!-- Filtros -->
-    <div class="bg-white rounded-xl shadow-lg p-4">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="rounded-2xl bg-slate-200/80 p-4 shadow-inner border border-slate-300/50">
+        <div class="flex flex-wrap items-end gap-4">
             @if($this->isSupervisor)
-                <div>
-                    <x-input-label for="tipo" :value="__('Vista por')" />
+                <div class="flex-1 min-w-[200px]">
+                    <x-input-label for="tipo" :value="__('Vista por')" class="!text-xs" />
                     <div class="flex gap-2 mt-1">
                         <button
                             wire:click="$set('tipo', 'colaborador')"
-                            class="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors {{ $tipo === 'colaborador' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
+                            class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm font-medium {{ $tipo === 'colaborador' ? 'text-white border border-blue-600 shadow-sm' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50' }}"
+                            style="{{ $tipo === 'colaborador' ? 'background-color: #2563eb;' : '' }}"
                         >
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -24,7 +25,8 @@
                         </button>
                         <button
                             wire:click="$set('tipo', 'sku')"
-                            class="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors {{ $tipo === 'sku' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
+                            class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm font-medium {{ $tipo === 'sku' ? 'text-white border border-blue-600 shadow-sm' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50' }}"
+                            style="{{ $tipo === 'sku' ? 'background-color: #2563eb;' : '' }}"
                         >
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -34,23 +36,25 @@
                     </div>
                 </div>
             @endif
-            <div>
-                <x-input-label for="fechaInicio" :value="__('Fecha inicio')" />
-                <x-text-input
-                    id="fechaInicio"
-                    type="date"
-                    wire:model.live="fechaInicio"
-                    class="mt-1 block w-full"
-                />
-            </div>
-            <div>
-                <x-input-label for="fechaFin" :value="__('Fecha fin')" />
-                <x-text-input
-                    id="fechaFin"
-                    type="date"
-                    wire:model.live="fechaFin"
-                    class="mt-1 block w-full"
-                />
+            <div class="flex flex-wrap items-end gap-3 sm:gap-4">
+                <div class="w-[8.5rem]">
+                    <x-input-label for="fechaInicio" :value="__('Desde')" class="!text-xs" />
+                    <x-text-input
+                        id="fechaInicio"
+                        type="date"
+                        wire:model.live="fechaInicio"
+                        class="mt-1 block w-full text-sm h-9 py-1.5 rounded-lg border-slate-300"
+                    />
+                </div>
+                <div class="w-[8.5rem]">
+                    <x-input-label for="fechaFin" :value="__('Hasta')" class="!text-xs" />
+                    <x-text-input
+                        id="fechaFin"
+                        type="date"
+                        wire:model.live="fechaFin"
+                        class="mt-1 block w-full text-sm h-9 py-1.5 rounded-lg border-slate-300"
+                    />
+                </div>
             </div>
         </div>
     </div>

@@ -177,17 +177,17 @@ class BonoCalculator extends Component
 
             // Obtener asistencias del período
             $asistenciasQuery = Asistencia::where('colaborador_id', $colab->id);
-            
+
             if ($this->fechaInicio || $this->fechaFin) {
                 $startDate = $this->fechaInicio ? Carbon::parse($this->fechaInicio) : null;
                 $endDate = $this->fechaFin ? Carbon::parse($this->fechaFin) : null;
-                
+
                 if ($startDate && $endDate) {
                     $startYear = $startDate->year;
                     $endYear = $endDate->year;
                     $startWeek = $this->getWeekNumber($startDate);
                     $endWeek = $this->getWeekNumber($endDate);
-                    
+
                     if ($startYear === $endYear) {
                         $asistenciasQuery->where('anio', $startYear)
                             ->whereBetween('semana', [$startWeek, $endWeek]);
@@ -257,13 +257,27 @@ class BonoCalculator extends Component
 
     protected function getWeekNumber(Carbon $date): int
     {
-        $start = Carbon::create($date->year, 1, 1);
-        $dayOfWeek = $start->dayOfWeek;
+        // Encontrar el primer lunes del año
+        $firstDayOfYear = Carbon::create($date->year, 1, 1);
+        $dayOfWeek = $firstDayOfYear->dayOfWeek; // 0 = domingo, 1 = lunes, ..., 6 = sábado
+        
+        // Calcular días hasta el primer lunes
         $daysToMonday = $dayOfWeek === 0 ? 1 : ($dayOfWeek === 1 ? 0 : 8 - $dayOfWeek);
+        $firstMonday = $firstDayOfYear->copy()->addDays($daysToMonday);
         
-        $diff = $date->diffInDays($start);
+        // Si la fecha está antes del primer lunes, pertenece a la semana 1
+        if ($date->lt($firstMonday)) {
+            return 1;
+        }
         
-        return (int) ceil(($diff + $daysToMonday) / 7);
+        // Calcular la diferencia en días desde el primer lunes
+        $diff = $firstMonday->diffInDays($date, false);
+        
+        // Calcular el número de semana (sumar 1 porque la primera semana es la 1)
+        $weekNumber = (int) floor($diff / 7) + 1;
+        
+        // Asegurar que esté en el rango válido (1-52)
+        return max(1, min(52, $weekNumber));
     }
 
     protected function getFactor(string $semaforo): float
