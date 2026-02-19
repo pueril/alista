@@ -7,7 +7,7 @@
 
     <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h3 class="text-lg font-semibold text-gray-800">SKUs</h3>
-        @if($this->isSupervisor)
+        @if(auth()->user()?->isSupervisor())
             <button
                 type="button"
                 wire:click="openCreateModal"
@@ -39,13 +39,17 @@
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             {{ __('Estado') }}
                         </th>
-                        @if($this->isSupervisor)
+                        @if(auth()->user()?->isSupervisor())
                             <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 {{ __('Acciones') }}
                             </th>
                         @endif
                     </tr>
                 </thead>
+                @php
+                    /** @var \Illuminate\Contracts\Pagination\Paginator|\Illuminate\Support\Collection|null $skus */
+                    $skus = $skus ?? collect();
+                @endphp
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($skus as $sku)
                         <tr>
@@ -72,7 +76,7 @@
                                     </span>
                                 @endif
                             </td>
-                            @if($this->isSupervisor)
+                            @if(auth()->user()?->isSupervisor())
                                 <td class="px-4 py-2 whitespace-nowrap text-sm text-center">
                                     <div class="flex justify-center items-center gap-4">
                                         <button
@@ -117,7 +121,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ $this->isSupervisor ? '6' : '5' }}" class="px-4 py-6 text-center text-sm text-gray-500">
+                            <td colspan="{{ auth()->user()?->isSupervisor() ? '6' : '5' }}" class="px-4 py-6 text-center text-sm text-gray-500">
                                 {{ __('No hay SKUs registrados.') }}
                             </td>
                         </tr>
@@ -126,12 +130,14 @@
             </table>
         </div>
 
-        <div class="px-4 py-3 border-t border-slate-200 bg-slate-50/50">
-            {{ $skus->links() }}
-        </div>
+        @if($skus instanceof \Illuminate\Contracts\Pagination\Paginator)
+            <div class="px-4 py-3 border-t border-slate-200 bg-slate-50/50">
+                {{ $skus->links() }}
+            </div>
+        @endif
     </div>
 
-    @if($showModal)
+    @if($this->showModal)
         <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeModal"></div>
@@ -224,9 +230,9 @@
         </div>
     @endif
 
-    @if($showDeleteModal && $deletingId)
+    @if($this->showDeleteModal && $this->deletingId)
         @php
-            $sku = \App\Models\SKU::find($deletingId);
+            $sku = \App\Models\SKU::find($this->deletingId);
         @endphp
         <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">

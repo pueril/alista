@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class SKUsTable extends Component
+class SkusTable extends Component
 {
     use WithPagination;
 
@@ -23,13 +23,6 @@ class SKUsTable extends Component
     public string $formFamilia = '';
     public float $formMetaDiaria = 0;
     public float $formProdHora = 0;
-
-    public function getIsSupervisorProperty(): bool
-    {
-        $user = Auth::user();
-
-        return $user && $user->isSupervisor();
-    }
 
     public function openCreateModal(): void
     {
@@ -69,7 +62,7 @@ class SKUsTable extends Component
 
     public function save(): void
     {
-        if (! $this->isSupervisor) {
+        if (! Auth::user()?->isSupervisor()) {
             throw ValidationException::withMessages([
                 'form' => ['Solo los supervisores pueden crear o editar SKUs.'],
             ]);
@@ -128,7 +121,7 @@ class SKUsTable extends Component
 
     public function toggleActive(int $id): void
     {
-        if (! $this->isSupervisor) {
+        if (! Auth::user()?->isSupervisor()) {
             throw ValidationException::withMessages([
                 'form' => ['Solo los supervisores pueden activar/desactivar SKUs.'],
             ]);
@@ -154,7 +147,7 @@ class SKUsTable extends Component
 
     public function confirmDelete(): void
     {
-        if (! $this->isSupervisor) {
+        if (! Auth::user()?->isSupervisor()) {
             throw ValidationException::withMessages([
                 'form' => ['Solo los supervisores pueden eliminar SKUs.'],
             ]);
