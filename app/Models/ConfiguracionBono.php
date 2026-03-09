@@ -31,6 +31,9 @@ class ConfiguracionBono extends Model
         'limite_amarillo_prod',
         'meta_asistencia',
         'limite_amarillo_asist',
+        'descuento_atraso',
+        'descuento_ausencia',
+        'horas_por_dia',
     ];
 
     /**
@@ -52,6 +55,9 @@ class ConfiguracionBono extends Model
             'limite_amarillo_prod' => 'decimal:2',
             'meta_asistencia' => 'decimal:2',
             'limite_amarillo_asist' => 'decimal:2',
+            'descuento_atraso' => 'decimal:2',
+            'descuento_ausencia' => 'decimal:2',
+            'horas_por_dia' => 'decimal:2',
         ];
     }
 }

@@ -45,7 +45,7 @@
                 <span class="block text-xs text-transparent select-none">.</span>
                 <button
                     type="button"
-                    wire:click="$set('fechaInicio', null); $set('fechaFin', null)"
+                    wire:click="clearFilters"
                     class="mt-1 h-9 flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
                 >
                     {{ __('Limpiar Filtros') }}
@@ -499,6 +499,54 @@
                                                 required
                                             />
                                         </div>
+                                    </div>
+                                </div>
+
+                                <!-- Descuentos por asistencia (informativo) -->
+                                <div>
+                                    <h4 class="font-semibold text-gray-800 mb-3">Descuentos por asistencia (informativo)</h4>
+                                    <p class="text-xs text-gray-500 mb-2">Estos valores se muestran en Control de Asistencia para indicar qué debe ingresar el supervisor.</p>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <x-input-label for="formDescuentoAtraso" :value="__('Descuento por atraso (%)')" />
+                                            <x-text-input
+                                                id="formDescuentoAtraso"
+                                                type="number"
+                                                step="0.1"
+                                                wire:model="formDescuentoAtraso"
+                                                class="mt-1 block w-full"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <x-input-label for="formDescuentoAusencia" :value="__('Descuento por ausencia (%)')" />
+                                            <x-text-input
+                                                id="formDescuentoAusencia"
+                                                type="number"
+                                                step="0.1"
+                                                wire:model="formDescuentoAusencia"
+                                                class="mt-1 block w-full"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Horas por día -->
+                                <div>
+                                    <h4 class="font-semibold text-gray-800 mb-3">Jornada</h4>
+                                    <div>
+                                        <x-input-label for="formHorasPorDia" :value="__('Horas por día')" />
+                                        <x-text-input
+                                            id="formHorasPorDia"
+                                            type="number"
+                                            step="0.1"
+                                            min="0.1"
+                                            wire:model="formHorasPorDia"
+                                            class="mt-1 block w-full"
+                                            required
+                                        />
+                                        <p class="text-xs text-gray-500 mt-1">Se usa para calcular la Prod/Hora esperada de cada SKU (meta diaria ÷ horas por día).</p>
                                     </div>
                                 </div>
                             </div>

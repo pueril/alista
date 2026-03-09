@@ -1,7 +1,44 @@
-<div class="flex justify-center px-2 sm:px-0">
-    <!-- Contenedor con contraste: grilla 2x2 optimizada para tablet -->
-    <div class="w-full max-w-2xl rounded-2xl bg-slate-200/80 p-4 sm:p-6 shadow-inner">
-        <div class="grid grid-cols-2 gap-4 sm:gap-6">
+<div class="space-y-6">
+    <!-- Filtros -->
+    <div class="rounded-2xl bg-slate-200/80 p-4 shadow-inner border border-slate-300/50">
+        <div class="flex flex-wrap items-end gap-4">
+            <div class="flex flex-wrap items-end gap-3 sm:gap-4">
+                <div class="w-[8.5rem]">
+                    <x-input-label for="fechaInicio" :value="__('Desde')" class="!text-xs" />
+                    <x-text-input
+                        id="fechaInicio"
+                        type="date"
+                        wire:model.live="fechaInicio"
+                        class="mt-1 block w-full text-sm h-9 py-1.5 rounded-lg border-slate-300"
+                    />
+                </div>
+                <div class="w-[8.5rem]">
+                    <x-input-label for="fechaFin" :value="__('Hasta')" class="!text-xs" />
+                    <x-text-input
+                        id="fechaFin"
+                        type="date"
+                        wire:model.live="fechaFin"
+                        class="mt-1 block w-full text-sm h-9 py-1.5 rounded-lg border-slate-300"
+                    />
+                </div>
+            </div>
+            <div class="flex flex-col justify-end">
+                <span class="block text-xs text-transparent select-none">.</span>
+                <button
+                    type="button"
+                    wire:click="clearFilters"
+                    class="mt-1 h-9 flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                >
+                    {{ __('Limpiar Filtros') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-center px-2 sm:px-0">
+        <!-- Contenedor con contraste: grilla 2x2 optimizada para tablet -->
+        <div class="w-full max-w-2xl rounded-2xl bg-slate-200/80 p-4 sm:p-6 shadow-inner">
+            <div class="grid grid-cols-2 gap-4 sm:gap-6">
             <!-- Tarjeta Colaboradores -->
             <div class="relative overflow-hidden bg-white rounded-xl shadow-md border border-slate-300 hover:shadow-lg transition-shadow duration-200">
             <div class="p-6">
@@ -93,5 +130,6 @@
         </div>
         </div>
     </div>
+</div>
 </div>
 

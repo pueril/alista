@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\WithDateFilters;
 use App\Models\Colaborador;
 use App\Models\RegistroDiario;
 use App\Models\SKU;
@@ -13,7 +14,7 @@ use Livewire\WithPagination;
 
 class DailyRecordsTable extends Component
 {
-    use WithPagination;
+    use WithPagination, WithDateFilters;
 
     public ?string $fechaInicio = null;
     public ?string $fechaFin = null;
@@ -40,6 +41,9 @@ class DailyRecordsTable extends Component
 
     public function updating($name, $value): void
     {
+        if (in_array($name, ['fechaInicio', 'fechaFin'], true)) {
+            $this->saveDateFiltersToSession();
+        }
         if (in_array($name, ['fechaInicio', 'fechaFin', 'colaboradorId', 'skuId'], true)) {
             $this->resetPage();
         }
@@ -47,6 +51,7 @@ class DailyRecordsTable extends Component
 
     public function mount(): void
     {
+        $this->initializeDateFilters();
         $this->formFecha = now()->format('Y-m-d');
     }
 

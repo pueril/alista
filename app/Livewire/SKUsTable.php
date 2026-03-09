@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\ConfiguracionBono;
 use App\Models\SKU;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -22,7 +23,24 @@ class SkusTable extends Component
     public string $formCodigo = '';
     public string $formFamilia = '';
     public float $formMetaDiaria = 0;
-    public float $formProdHora = 0;
+
+    protected function getHorasPorDia(): float
+    {
+        $config = ConfiguracionBono::first();
+        $horas = $config ? (float) $config->horas_por_dia : 9.5;
+
+        return $horas > 0 ? $horas : 9.5;
+    }
+
+    public function getFormProdHoraCalculadoProperty(): float
+    {
+        $horas = $this->getHorasPorDia();
+        if ($horas <= 0 || $this->formMetaDiaria <= 0) {
+            return 0.0;
+        }
+
+        return round($this->formMetaDiaria / $horas, 5);
+    }
 
     public function openCreateModal(): void
     {
@@ -30,7 +48,6 @@ class SkusTable extends Component
         $this->formCodigo = '';
         $this->formFamilia = '';
         $this->formMetaDiaria = 0;
-        $this->formProdHora = 0;
         $this->showModal = true;
     }
 
@@ -41,7 +58,6 @@ class SkusTable extends Component
         $this->formCodigo = $sku->codigo;
         $this->formFamilia = $sku->familia;
         $this->formMetaDiaria = $sku->meta_diaria;
-        $this->formProdHora = $sku->prod_hora;
         $this->showModal = true;
     }
 
@@ -57,7 +73,6 @@ class SkusTable extends Component
         $this->formCodigo = '';
         $this->formFamilia = '';
         $this->formMetaDiaria = 0;
-        $this->formProdHora = 0;
     }
 
     public function save(): void
@@ -72,21 +87,20 @@ class SkusTable extends Component
             'formCodigo' => 'required|string|max:255',
             'formFamilia' => 'required|string|max:255',
             'formMetaDiaria' => 'required|numeric|min:0',
-            'formProdHora' => 'required|numeric|min:0',
         ], [
             'formCodigo.required' => 'El código SKU es obligatorio.',
             'formFamilia.required' => 'La familia es obligatoria.',
             'formMetaDiaria.required' => 'La meta diaria es obligatoria.',
             'formMetaDiaria.min' => 'La meta diaria no puede ser negativa.',
-            'formProdHora.required' => 'La productividad por hora es obligatoria.',
-            'formProdHora.min' => 'La productividad por hora no puede ser negativa.',
         ]);
+
+        $prodHora = $this->formProdHoraCalculado;
 
         $data = [
             'codigo' => $this->formCodigo,
             'familia' => $this->formFamilia,
             'meta_diaria' => $this->formMetaDiaria,
-            'prod_hora' => $this->formProdHora,
+            'prod_hora' => $prodHora,
         ];
 
         if ($this->editingId) {

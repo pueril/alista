@@ -34,10 +34,6 @@ new class extends Component
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('records.index')" :active="request()->routeIs('records.index')" wire:navigate>
-                        {{ __('Registros diarios') }}
-                    </x-nav-link>
-
                     @if(auth()->user() && auth()->user()->isSupervisor())
                         <x-nav-link :href="route('colaboradores.index')" :active="request()->routeIs('colaboradores.index')" wire:navigate>
                             {{ __('Colaboradores') }}
@@ -46,19 +42,27 @@ new class extends Component
                         <x-nav-link :href="route('skus.index')" :active="request()->routeIs('skus.index')" wire:navigate>
                             {{ __('SKUs') }}
                         </x-nav-link>
-
-                        <x-nav-link :href="route('bono.index')" :active="request()->routeIs('bono.index')" wire:navigate>
-                            {{ __('Bono') }}
-                        </x-nav-link>
                     @endif
 
-                    <x-nav-link :href="route('productividad.index')" :active="request()->routeIs('productividad.index')" wire:navigate>
-                        {{ __('Productividad') }}
+                    <x-nav-link :href="route('records.index')" :active="request()->routeIs('records.index')" wire:navigate>
+                        {{ __('Registros diarios') }}
                     </x-nav-link>
 
                     <x-nav-link :href="route('asistencias.index')" :active="request()->routeIs('asistencias.index')" wire:navigate>
                         {{ __('Asistencias') }}
                     </x-nav-link>
+
+                    @if(auth()->user() && auth()->user()->isSupervisor())
+                    <x-nav-link :href="route('productividad.index')" :active="request()->routeIs('productividad.index')" wire:navigate>
+                        {{ __('Productividad') }}
+                    </x-nav-link>
+                    @endif
+
+                    @if(auth()->user() && auth()->user()->isSupervisor())
+                        <x-nav-link :href="route('bono.index')" :active="request()->routeIs('bono.index')" wire:navigate>
+                            {{ __('Bono') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -111,10 +115,6 @@ new class extends Component
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('records.index')" :active="request()->routeIs('records.index')" wire:navigate>
-                {{ __('Registros diarios') }}
-            </x-responsive-nav-link>
-
             @if(auth()->user() && auth()->user()->isSupervisor())
                 <x-responsive-nav-link :href="route('colaboradores.index')" :active="request()->routeIs('colaboradores.index')" wire:navigate>
                     {{ __('Colaboradores') }}
@@ -123,19 +123,27 @@ new class extends Component
                 <x-responsive-nav-link :href="route('skus.index')" :active="request()->routeIs('skus.index')" wire:navigate>
                     {{ __('SKUs') }}
                 </x-responsive-nav-link>
-
-                <x-responsive-nav-link :href="route('bono.index')" :active="request()->routeIs('bono.index')" wire:navigate>
-                    {{ __('Bono') }}
-                </x-responsive-nav-link>
             @endif
 
-            <x-responsive-nav-link :href="route('productividad.index')" :active="request()->routeIs('productividad.index')" wire:navigate>
-                {{ __('Productividad') }}
+            <x-responsive-nav-link :href="route('records.index')" :active="request()->routeIs('records.index')" wire:navigate>
+                {{ __('Registros diarios') }}
             </x-responsive-nav-link>
 
             <x-responsive-nav-link :href="route('asistencias.index')" :active="request()->routeIs('asistencias.index')" wire:navigate>
                 {{ __('Asistencias') }}
             </x-responsive-nav-link>
+
+            @if(auth()->user() && auth()->user()->isSupervisor())
+            <x-responsive-nav-link :href="route('productividad.index')" :active="request()->routeIs('productividad.index')" wire:navigate>
+                {{ __('Productividad') }}
+            </x-responsive-nav-link>
+            @endif
+
+            @if(auth()->user() && auth()->user()->isSupervisor())
+                <x-responsive-nav-link :href="route('bono.index')" :active="request()->routeIs('bono.index')" wire:navigate>
+                    {{ __('Bono') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

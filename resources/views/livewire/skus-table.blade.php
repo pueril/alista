@@ -195,14 +195,12 @@
                                         <x-input-label for="formProdHora" :value="__('Prod/Hora')" />
                                         <x-text-input
                                             id="formProdHora"
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
-                                            wire:model="formProdHora"
-                                            class="mt-1 block w-full rounded-lg border-slate-300"
-                                            required
+                                            type="text"
+                                            class="mt-1 block w-full rounded-lg border-slate-300 bg-slate-100 read-only:bg-slate-100"
+                                            readonly
+                                            value="{{ number_format($this->formProdHoraCalculado, 5, ',', '.') }}"
                                         />
-                                        <x-input-error :messages="$errors->get('formProdHora')" class="mt-2" />
+                                        <p class="text-xs text-slate-500 mt-1">Calculado: meta diaria ÷ horas por día (configuración de bono).</p>
                                     </div>
                                 </div>
                             </div>

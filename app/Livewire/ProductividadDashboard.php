@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\WithDateFilters;
 use App\Models\Asistencia;
 use App\Models\Colaborador;
 use App\Models\RegistroDiario;
@@ -12,6 +13,8 @@ use Livewire\Component;
 
 class ProductividadDashboard extends Component
 {
+    use WithDateFilters;
+
     public string $tipo = 'colaborador'; // 'colaborador' o 'sku'
     public ?string $fechaInicio = null;
     public ?string $fechaFin = null;
@@ -22,9 +25,23 @@ class ProductividadDashboard extends Component
         'fechaFin' => ['except' => ''],
     ];
 
+    public function mount(): void
+    {
+        $this->initializeDateFilters();
+    }
+
     public function updating($name, $value): void
     {
-        // Resetear cuando cambian los filtros
+        if (in_array($name, ['fechaInicio', 'fechaFin'], true)) {
+            $this->saveDateFiltersToSession();
+        }
+    }
+
+    public function clearFilters(): void
+    {
+        $this->fechaInicio = null;
+        $this->fechaFin = null;
+        $this->clearDateFiltersFromSession();
     }
 
     public function getIsSupervisorProperty(): bool

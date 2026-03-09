@@ -37,7 +37,7 @@ class SKU extends Model
     {
         return [
             'meta_diaria' => 'decimal:2',
-            'prod_hora' => 'decimal:2',
+            'prod_hora' => 'decimal:5',
             'activo' => 'boolean',
         ];
     }

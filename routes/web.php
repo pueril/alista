@@ -17,19 +17,19 @@ Route::view('registros-diarios', 'records.index')
     ->name('records.index');
 
 Route::view('colaboradores', 'colaboradores.index')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'supervisor'])
     ->name('colaboradores.index');
 
 Route::view('skus', 'skus.index')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'supervisor'])
     ->name('skus.index');
 
 Route::view('bono', 'bono.index')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'supervisor'])
     ->name('bono.index');
 
 Route::view('productividad', 'productividad.index')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'supervisor'])
     ->name('productividad.index');
 
 Route::view('asistencias', 'asistencias.index')

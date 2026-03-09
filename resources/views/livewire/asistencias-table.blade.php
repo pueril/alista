@@ -22,9 +22,9 @@
         @endif
     </div>
 
-    <!-- Filtros -->
-    <div class="rounded-2xl bg-slate-200/80 p-4 shadow-inner border border-slate-300/50">
-        <div class="flex flex-wrap items-end gap-3 sm:gap-4">
+    <!-- Filtros y Descuento por asistencia -->
+    <div class="flex flex-wrap items-stretch gap-4">
+        <div class="rounded-2xl bg-slate-200/80 p-4 shadow-inner border border-slate-300/50 flex flex-wrap items-end gap-3 sm:gap-4">
             <div class="w-[8rem]">
                 <x-input-label for="selectedAnio" :value="__('Año')" class="!text-xs" />
                 <select
@@ -70,6 +70,19 @@
                     @endfor
                 </select>
             </div>
+        </div>
+        @php
+            $configBono = \App\Models\ConfiguracionBono::first();
+            $descuentoAtraso = $configBono ? (float) $configBono->descuento_atraso : -2;
+            $descuentoAusencia = $configBono ? (float) $configBono->descuento_ausencia : -5;
+        @endphp
+        <div class="rounded-2xl bg-slate-200/80 p-4 shadow-inner border border-slate-300/50 min-w-[14rem]">
+            <p class="text-sm font-semibold text-slate-800">Descuento por asistencia</p>
+            <ul class="mt-1 text-xs text-slate-700 space-y-0.5">
+                <li>0% Sin atraso ni ausencia</li>
+                <li>-{{ number_format(abs($descuentoAtraso), 0) }}% por atraso</li>
+                <li>-{{ number_format(abs($descuentoAusencia), 0) }}% por ausencia</li>
+            </ul>
         </div>
     </div>
 

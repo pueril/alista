@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\WithDateFilters;
 use App\Models\Asistencia;
 use App\Models\Colaborador;
 use App\Models\ConfiguracionBono;
@@ -13,6 +14,8 @@ use Livewire\Component;
 
 class BonoCalculator extends Component
 {
+    use WithDateFilters;
+
     public ?string $fechaInicio = null;
     public ?string $fechaFin = null;
     public bool $showConfigModal = false;
@@ -32,6 +35,9 @@ class BonoCalculator extends Component
     public float $formLimiteAmarilloProd = 80;
     public float $formMetaAsistencia = 0;
     public float $formLimiteAmarilloAsist = -5;
+    public float $formDescuentoAtraso = -2;
+    public float $formDescuentoAusencia = -5;
+    public float $formHorasPorDia = 9.5;
 
     protected $queryString = [
         'fechaInicio' => ['except' => ''],
@@ -40,6 +46,7 @@ class BonoCalculator extends Component
 
     public function mount(): void
     {
+        $this->initializeDateFilters();
         $this->loadConfig();
         $this->calculateBonos();
     }
@@ -47,8 +54,17 @@ class BonoCalculator extends Component
     public function updated($name, $value): void
     {
         if (in_array($name, ['fechaInicio', 'fechaFin'], true)) {
+            $this->saveDateFiltersToSession();
             $this->calculateBonos();
         }
+    }
+
+    public function clearFilters(): void
+    {
+        $this->fechaInicio = null;
+        $this->fechaFin = null;
+        $this->clearDateFiltersFromSession();
+        $this->calculateBonos();
     }
 
     public function getIsSupervisorProperty(): bool
@@ -75,6 +91,9 @@ class BonoCalculator extends Component
                 'limite_amarillo_prod' => 80,
                 'meta_asistencia' => 0,
                 'limite_amarillo_asist' => -5,
+                'descuento_atraso' => -2,
+                'descuento_ausencia' => -5,
+                'horas_por_dia' => 9.5,
             ]);
         }
 
@@ -90,6 +109,9 @@ class BonoCalculator extends Component
         $this->formLimiteAmarilloProd = $this->config->limite_amarillo_prod;
         $this->formMetaAsistencia = $this->config->meta_asistencia;
         $this->formLimiteAmarilloAsist = $this->config->limite_amarillo_asist;
+        $this->formDescuentoAtraso = (float) ($this->config->descuento_atraso ?? -2);
+        $this->formDescuentoAusencia = (float) ($this->config->descuento_ausencia ?? -5);
+        $this->formHorasPorDia = (float) ($this->config->horas_por_dia ?? 9.5);
     }
 
     public function openConfigModal(): void
@@ -123,6 +145,9 @@ class BonoCalculator extends Component
             'formLimiteAmarilloProd' => 'required|numeric',
             'formMetaAsistencia' => 'required|numeric',
             'formLimiteAmarilloAsist' => 'required|numeric',
+            'formDescuentoAtraso' => 'required|numeric',
+            'formDescuentoAusencia' => 'required|numeric',
+            'formHorasPorDia' => 'required|numeric|min:0.1',
         ]);
 
         $this->config->update([
@@ -137,6 +162,9 @@ class BonoCalculator extends Component
             'limite_amarillo_prod' => $this->formLimiteAmarilloProd,
             'meta_asistencia' => $this->formMetaAsistencia,
             'limite_amarillo_asist' => $this->formLimiteAmarilloAsist,
+            'descuento_atraso' => $this->formDescuentoAtraso,
+            'descuento_ausencia' => $this->formDescuentoAusencia,
+            'horas_por_dia' => $this->formHorasPorDia,
         ]);
 
         $this->config->refresh();

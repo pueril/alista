@@ -54,49 +54,45 @@ class AsistenciasTable extends Component
 
     protected function getCurrentWeek(): int
     {
-        $now = now();
-        $start = Carbon::create($now->year, 1, 1);
-        $dayOfWeek = $start->dayOfWeek;
-        $daysToMonday = $dayOfWeek === 0 ? 1 : ($dayOfWeek === 1 ? 0 : 8 - $dayOfWeek);
-        $diff = $now->diffInDays($start);
-        return (int) ceil(($diff + $daysToMonday) / 7);
+        return (int) now()->weekOfYear;
     }
 
+    /**
+     * Devuelve los números de semana (ISO 1-53) que tienen al menos un día en el mes dado.
+     */
     protected function getWeeksInMonth(int $month, int $year): array
     {
         $weeks = [];
-        $firstDay = Carbon::create($year, $month, 1);
+        $date = Carbon::create($year, $month, 1);
         $lastDay = Carbon::create($year, $month)->endOfMonth();
-        
-        $startWeek = $this->getWeekNumber($firstDay);
-        $endWeek = $this->getWeekNumber($lastDay);
-        
-        for ($w = $startWeek; $w <= $endWeek; $w++) {
-            $weeks[] = $w;
+
+        while ($date->lte($lastDay)) {
+            $w = (int) $date->weekOfYear;
+            if (! in_array($w, $weeks, true)) {
+                $weeks[] = $w;
+            }
+            $date->addDay();
         }
-        
+
+        sort($weeks);
+
         return $weeks;
     }
 
     protected function getWeekNumber(Carbon $date): int
     {
-        $start = Carbon::create($date->year, 1, 1);
-        $dayOfWeek = $start->dayOfWeek;
-        $daysToMonday = $dayOfWeek === 0 ? 1 : ($dayOfWeek === 1 ? 0 : 8 - $dayOfWeek);
-        $diff = $date->diffInDays($start);
-        return (int) ceil(($diff + $daysToMonday) / 7);
+        return (int) $date->weekOfYear;
     }
 
+    /**
+     * Rango de fechas (lun-dom) para una semana ISO del año.
+     */
     public function getWeekDateRange(int $weekNumber, int $year): string
     {
-        $firstDayOfYear = Carbon::create($year, 1, 1);
-        $dayOfWeek = $firstDayOfYear->dayOfWeek;
-        $daysToMonday = $dayOfWeek === 0 ? 1 : ($dayOfWeek === 1 ? 0 : 8 - $dayOfWeek);
-        
-        $startDate = $firstDayOfYear->copy()->addDays($daysToMonday + ($weekNumber - 1) * 7);
-        $endDate = $startDate->copy()->addDays(6);
-        
-        return $startDate->format('d/m') . ' - ' . $endDate->format('d/m');
+        $date = Carbon::now()->setISODate($year, $weekNumber)->startOfWeek();
+        $endDate = $date->copy()->addDays(6);
+
+        return $date->format('d/m') . ' - ' . $endDate->format('d/m');
     }
 
     public function openCreateModal(): void
@@ -203,10 +199,14 @@ class AsistenciasTable extends Component
             ->where('anio', $this->selectedAnio);
 
         if ($this->selectedSemana) {
-            $query->where('semana', $this->selectedSemana);
-        } elseif ($this->selectedMes) {
-            $semanasDelMes = $this->getWeeksInMonth($this->selectedMes, $this->selectedAnio);
-            $query->whereIn('semana', $semanasDelMes);
+            $query->where('semana', (int) $this->selectedSemana);
+        } elseif ($this->selectedMes !== null && $this->selectedMes !== '') {
+            $mes = (int) $this->selectedMes;
+            $anio = (int) $this->selectedAnio;
+            $semanasDelMes = $this->getWeeksInMonth($mes, $anio);
+            if (! empty($semanasDelMes)) {
+                $query->whereIn('semana', $semanasDelMes);
+            }
         }
 
         // Restricción para colaboradores
