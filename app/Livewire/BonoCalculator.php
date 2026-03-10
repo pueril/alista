@@ -283,26 +283,20 @@ class BonoCalculator extends Component
         }
 
         // Ajuste especial para líderes:
-        // Sus indicadores se basan en el promedio de todos los colaboradores (ayudantes + líder),
-        // considerando los filtros aplicados.
+        // Productividad del líder = promedio de la productividad de todos los colaboradores (ayudantes + líder)
+        // Asistencia del líder = se mantiene su propia asistencia calculada arriba.
         if (count($this->resultados) > 0) {
             $productividades = array_column($this->resultados, 'productividadPromedio');
-            $asistencias = array_column($this->resultados, 'totalAsistencia');
 
             $promedioGlobalProductividad = count($productividades) > 0
                 ? array_sum($productividades) / count($productividades)
                 : 0.0;
 
-            $promedioGlobalAsistencia = count($asistencias) > 0
-                ? array_sum($asistencias) / count($asistencias)
-                : 0.0;
-
             foreach ($this->resultados as &$resultado) {
                 if ($resultado['colaborador']->perfil === 'LIDER') {
                     $promProd = $promedioGlobalProductividad;
-                    $totAsist = $promedioGlobalAsistencia;
 
-                    // Recalcular semáforo y factores para productividad
+                    // Recalcular solo PRODUCTIVIDAD del líder con el promedio global
                     $semaforoProd = 'ROJO';
                     if ($promProd >= $this->config->meta_productividad) {
                         $semaforoProd = 'VERDE';
@@ -311,33 +305,18 @@ class BonoCalculator extends Component
                     }
                     $factorProd = $this->getFactor($semaforoProd);
 
-                    // Recalcular semáforo y factores para asistencia
-                    $semaforoAsist = 'ROJO';
-                    if ($totAsist >= $this->config->meta_asistencia) {
-                        $semaforoAsist = 'VERDE';
-                    } elseif ($totAsist >= $this->config->limite_amarillo_asist) {
-                        $semaforoAsist = 'AMARILLO';
-                    }
-                    $factorAsist = $this->getFactor($semaforoAsist);
-
                     $bonoBaseProdLider = $this->config->lider_productividad;
-                    $bonoBaseAsistLider = $this->config->lider_asistencia;
-
                     $bonoProd = round($bonoBaseProdLider * $factorProd);
-                    $bonoAsist = round($bonoBaseAsistLider * $factorAsist);
-                    $bonoTotal = $bonoProd + $bonoAsist;
+
+                    // Asistencia del líder se mantiene tal como se calculó antes
+                    $bonoAsist = $resultado['bonoAsistencia'];
 
                     $resultado['productividadPromedio'] = $promProd;
-                    $resultado['totalAsistencia'] = $totAsist;
                     $resultado['semaforo_prod'] = $semaforoProd;
                     $resultado['factor_prod'] = $factorProd;
-                    $resultado['semaforo_asist'] = $semaforoAsist;
-                    $resultado['factor_asist'] = $factorAsist;
                     $resultado['bonoBaseProd'] = $bonoBaseProdLider;
-                    $resultado['bonoBaseAsist'] = $bonoBaseAsistLider;
                     $resultado['bonoProductividad'] = $bonoProd;
-                    $resultado['bonoAsistencia'] = $bonoAsist;
-                    $resultado['bonoTotal'] = $bonoTotal;
+                    $resultado['bonoTotal'] = $bonoProd + $bonoAsist;
                 }
             }
             unset($resultado);

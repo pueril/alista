@@ -46,6 +46,7 @@ class ProductividadDashboard extends Component
 
     public function getIsSupervisorProperty(): bool
     {
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
         return $user && $user->isSupervisor();
     }
@@ -62,6 +63,7 @@ class ProductividadDashboard extends Component
         }
 
         // Restricción para colaboradores
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
         if ($user && !$user->isSupervisor() && $user->colaborador_id) {
             $where[] = ['colaborador_id', $user->colaborador_id];
@@ -72,9 +74,40 @@ class ProductividadDashboard extends Component
                 ->where($where)
                 ->get();
 
-            // Obtener asistencias del año actual
-            $currentYear = now()->year;
-            $asistencias = Asistencia::where('anio', $currentYear)->get();
+            // Obtener asistencias del período filtrado
+            $asistenciasQuery = Asistencia::query();
+
+            if ($user && !$user->isSupervisor() && $user->colaborador_id) {
+                $asistenciasQuery->where('colaborador_id', $user->colaborador_id);
+            }
+
+            if ($this->fechaInicio || $this->fechaFin) {
+                $startDate = $this->fechaInicio ? Carbon::parse($this->fechaInicio) : null;
+                $endDate = $this->fechaFin ? Carbon::parse($this->fechaFin) : null;
+
+                if ($startDate && $endDate) {
+                    $startYear = $startDate->year;
+                    $endYear = $endDate->year;
+                    $startWeek = $this->getWeekNumber($startDate);
+                    $endWeek = $this->getWeekNumber($endDate);
+
+                    if ($startYear === $endYear) {
+                        $asistenciasQuery->where('anio', $startYear)
+                            ->whereBetween('semana', [$startWeek, $endWeek]);
+                    } else {
+                        $asistenciasQuery->whereBetween('anio', [$startYear, $endYear]);
+                    }
+                } elseif ($startDate) {
+                    $asistenciasQuery->where('anio', '>=', $startDate->year);
+                } elseif ($endDate) {
+                    $asistenciasQuery->where('anio', '<=', $endDate->year);
+                }
+            } else {
+                // Sin filtro de fechas: usar año actual como antes
+                $asistenciasQuery->where('anio', now()->year);
+            }
+
+            $asistencias = $asistenciasQuery->get();
 
             // Agrupar asistencias por colaborador
             $asistenciaPorColaborador = [];
@@ -193,5 +226,30 @@ class ProductividadDashboard extends Component
         return view('livewire.productividad-dashboard', [
             'data' => $data,
         ]);
+    }
+
+    protected function getWeekNumber(Carbon $date): int
+    {
+        // Encontrar el primer lunes del año
+        $firstDayOfYear = Carbon::create($date->year, 1, 1);
+        $dayOfWeek = $firstDayOfYear->dayOfWeek; // 0 = domingo, 1 = lunes, ..., 6 = sábado
+
+        // Calcular días hasta el primer lunes
+        $daysToMonday = $dayOfWeek === 0 ? 1 : ($dayOfWeek === 1 ? 0 : 8 - $dayOfWeek);
+        $firstMonday = $firstDayOfYear->copy()->addDays($daysToMonday);
+
+        // Si la fecha está antes del primer lunes, pertenece a la semana 1
+        if ($date->lt($firstMonday)) {
+            return 1;
+        }
+
+        // Calcular la diferencia en días desde el primer lunes
+        $diff = $firstMonday->diffInDays($date, false);
+
+        // Calcular el número de semana (sumar 1 porque la primera semana es la 1)
+        $weekNumber = (int) floor($diff / 7) + 1;
+
+        // Asegurar que esté en el rango válido (1-52)
+        return max(1, min(52, $weekNumber));
     }
 }
