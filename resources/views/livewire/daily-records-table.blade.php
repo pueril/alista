@@ -7,16 +7,14 @@
 
     <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h3 class="text-lg font-semibold text-gray-800">Registros</h3>
-        @if($this->isSupervisor)
-            <button
-                type="button"
-                wire:click="openCreateModal"
-                class="inline-flex items-center gap-2.5 rounded-lg bg-sky-200 px-6 py-3.5 text-lg font-semibold text-sky-900 shadow-md border border-sky-300 hover:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 active:bg-sky-400"
-            >
-                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-sky-500/30 text-sky-900 text-xl font-bold leading-none" aria-hidden="true">+</span>
-                {{ __('Nuevo Registro') }}
-            </button>
-        @endif
+        <button
+            type="button"
+            wire:click="openCreateModal"
+            class="inline-flex items-center gap-2.5 rounded-lg bg-sky-200 px-6 py-3.5 text-lg font-semibold text-sky-900 shadow-md border border-sky-300 hover:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 active:bg-sky-400"
+        >
+            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-sky-500/30 text-sky-900 text-xl font-bold leading-none" aria-hidden="true">+</span>
+            {{ __('Nuevo Registro') }}
+        </button>
     </div>
 
     {{-- Tarjeta de filtros compacta, en línea con el dashboard --}}

@@ -53,13 +53,26 @@ class DailyRecordsTable extends Component
     {
         $this->initializeDateFilters();
         $this->formFecha = now()->format('Y-m-d');
+        
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        if ($user && $user->isColaborador() && $user->colaborador_id) {
+            $this->formColaboradorId = (string) $user->colaborador_id;
+        }
     }
 
     public function openCreateModal(): void
     {
         $this->editingId = null;
         $this->formFecha = now()->format('Y-m-d');
-        $this->formColaboradorId = '';
+        
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        if ($user && $user->isColaborador() && $user->colaborador_id) {
+            $this->formColaboradorId = (string) $user->colaborador_id;
+        } else {
+            $this->formColaboradorId = '';
+        }
         $this->formSkuId = '';
         $this->formProcesadas = 0;
         $this->formHoraIngreso = '08:00';
@@ -125,10 +138,32 @@ class DailyRecordsTable extends Component
 
     public function save(): void
     {
-        if (! $this->isSupervisor) {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+
+        if (! $user) {
             throw ValidationException::withMessages([
-                'form' => ['Solo los supervisores pueden crear o editar registros.'],
+                'form' => ['No hay usuario autenticado.'],
             ]);
+        }
+
+        $isSupervisor = $this->isSupervisor;
+        $isColaborador = $user->isColaborador();
+
+        if (! $isSupervisor && ! $isColaborador) {
+            throw ValidationException::withMessages([
+                'form' => ['No tienes permisos para crear o editar registros.'],
+            ]);
+        }
+
+        if ($isColaborador) {
+            if (! $user->colaborador_id) {
+                throw ValidationException::withMessages([
+                    'form' => ['Tu usuario no tiene un colaborador asociado. Contacta a un supervisor.'],
+                ]);
+            }
+
+            $this->formColaboradorId = (string) $user->colaborador_id;
         }
 
         $this->validate([
@@ -200,6 +235,7 @@ class DailyRecordsTable extends Component
 
     public function getIsSupervisorProperty(): bool
     {
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
 
         return $user && $user->isSupervisor();
