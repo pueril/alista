@@ -156,13 +156,7 @@ class DailyRecordsTable extends Component
             ]);
         }
 
-        if ($isColaborador) {
-            if (! $user->colaborador_id) {
-                throw ValidationException::withMessages([
-                    'form' => ['Tu usuario no tiene un colaborador asociado. Contacta a un supervisor.'],
-                ]);
-            }
-
+        if ($isColaborador && $user->colaborador_id) {
             $this->formColaboradorId = (string) $user->colaborador_id;
         }
 
