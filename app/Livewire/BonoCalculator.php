@@ -283,10 +283,15 @@ class BonoCalculator extends Component
         }
 
         // Ajuste especial para líderes:
-        // Productividad del líder = promedio de la productividad de todos los colaboradores (ayudantes + líder)
+        // Productividad del líder = promedio de la productividad de todos los colaboradores activos excepto el líder.
         // Asistencia del líder = se mantiene su propia asistencia calculada arriba.
         if (count($this->resultados) > 0) {
-            $productividades = array_column($this->resultados, 'productividadPromedio');
+            $productividades = [];
+            foreach ($this->resultados as $r) {
+                if ($r['colaborador']->perfil !== 'LIDER') {
+                    $productividades[] = $r['productividadPromedio'];
+                }
+            }
 
             $promedioGlobalProductividad = count($productividades) > 0
                 ? array_sum($productividades) / count($productividades)
