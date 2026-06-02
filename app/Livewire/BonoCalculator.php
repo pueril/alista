@@ -213,12 +213,15 @@ class BonoCalculator extends Component
                 if ($startDate && $endDate) {
                     $startYear = $startDate->year;
                     $endYear = $endDate->year;
-                    $startWeek = $this->getWeekNumber($startDate);
-                    $endWeek = $this->getWeekNumber($endDate);
 
                     if ($startYear === $endYear) {
-                        $asistenciasQuery->where('anio', $startYear)
-                            ->whereBetween('semana', [$startWeek, $endWeek]);
+                        $weeks = $this->getWeekNumbersInDateRange($startDate, $endDate);
+                        $asistenciasQuery->where('anio', $startYear);
+                        if ($weeks !== []) {
+                            $asistenciasQuery->whereIn('semana', $weeks);
+                        } else {
+                            $asistenciasQuery->whereRaw('0 = 1');
+                        }
                     } else {
                         $asistenciasQuery->whereBetween('anio', [$startYear, $endYear]);
                     }
@@ -328,29 +331,28 @@ class BonoCalculator extends Component
         }
     }
 
-    protected function getWeekNumber(Carbon $date): int
+    /**
+     * Semanas ISO (misma lógica que AsistenciasTable) con al menos un día en el rango.
+     *
+     * @return list<int>
+     */
+    protected function getWeekNumbersInDateRange(Carbon $startDate, Carbon $endDate): array
     {
-        // Encontrar el primer lunes del año
-        $firstDayOfYear = Carbon::create($date->year, 1, 1);
-        $dayOfWeek = $firstDayOfYear->dayOfWeek; // 0 = domingo, 1 = lunes, ..., 6 = sábado
-        
-        // Calcular días hasta el primer lunes
-        $daysToMonday = $dayOfWeek === 0 ? 1 : ($dayOfWeek === 1 ? 0 : 8 - $dayOfWeek);
-        $firstMonday = $firstDayOfYear->copy()->addDays($daysToMonday);
-        
-        // Si la fecha está antes del primer lunes, pertenece a la semana 1
-        if ($date->lt($firstMonday)) {
-            return 1;
+        $weeks = [];
+        $date = $startDate->copy()->startOfDay();
+        $end = $endDate->copy()->startOfDay();
+
+        while ($date->lte($end)) {
+            $w = (int) $date->weekOfYear;
+            if (! in_array($w, $weeks, true)) {
+                $weeks[] = $w;
+            }
+            $date->addDay();
         }
-        
-        // Calcular la diferencia en días desde el primer lunes
-        $diff = $firstMonday->diffInDays($date, false);
-        
-        // Calcular el número de semana (sumar 1 porque la primera semana es la 1)
-        $weekNumber = (int) floor($diff / 7) + 1;
-        
-        // Asegurar que esté en el rango válido (1-52)
-        return max(1, min(52, $weekNumber));
+
+        sort($weeks);
+
+        return $weeks;
     }
 
     protected function getFactor(string $semaforo): float
